@@ -57,61 +57,39 @@ const servicesSchema = new mongoose.Schema({
 servicesSchema.methods.getAvailableTimes = async function (fecha) {
     const citas = await Citas.find({
         citaDate: {
-            $gte: new Date(`${fecha}T00:00:00`),
-            $lt: new Date(`${fecha}T23:59:59`),
+            $gte: new Date(`${fecha}T00:00:00Z`),
+            $lt: new Date(`${fecha}T23:59:59Z`),
         },
+        categoria: this.categoria
     });
 
     const availableTimes = [];
     const [horaInicio, minutoInicio] = this.horarioInicio.split(':').map(Number);
     const [horaFin, minutoFin] = this.horarioFin.split(':').map(Number);
 
-    // Filtrar citas de la misma categoría
-    const citasMismaCategoria = citas.filter(cita => cita.categoria === this.categoria);
+    const currentDate = new Date(`${fecha}T00:00:00Z`);
+    const currentTime = new Date(currentDate);
+    currentTime.setUTCHours(horaInicio, minutoInicio, 0, 0);
+    const endTime = new Date(currentDate);
+    endTime.setUTCHours(horaFin, minutoFin, 0, 0);
 
-    const maxEstaciones = this.estaciones;
-    const maxPersonal = this.personalTotal;
+    while (currentTime < endTime) {
+        const citasEnHora = citas.filter(cita => {
+            const citaDate = new Date(cita.citaDate);
+            return (
+                citaDate.getUTCHours() === currentTime.getUTCHours() &&
+                citaDate.getUTCMinutes() === currentTime.getUTCMinutes()
+            );
+        });
 
-    if (citasMismaCategoria.length < 2) {
-        // Si no hay suficientes citas de la misma categoría, permitir agendar
-        const currentDate = new Date(`${fecha}T00:00:00`);
-        const currentTime = new Date(currentDate.toLocaleString());
-        currentTime.setUTCHours(horaInicio, minutoInicio);
-        const endTime = new Date(currentDate.toLocaleString());
-        endTime.setUTCHours(horaFin, minutoFin, 0, 0);
+        const estacionesOcupadas = citasEnHora.length;
+        const personalOcupado = citasEnHora.reduce((acc, cita) => acc + cita.personalAsignado, 0);
 
-        if (citas.length === 0) {
-            // Si no hay citas para el día, mostrar todas las horas dentro del horario de servicio como disponibles
-            while (currentTime < endTime) {
-                if (currentTime.getHours() === 12 && currentTime.getMinutes() === 0) {
-                    currentTime.setHours(13, 0, 0, 0);
-                }
-
-                availableTimes.push(currentTime.toISOString());
-                currentTime.setMinutes(currentTime.getMinutes() + this.duration);
-            }
-        } else {
-            while (currentTime < endTime) {
-                const citasEnHora = citas.filter(cita => {
-                    const citaDate = new Date(cita.citaDate);
-                    return (
-                        citaDate.getHours() === currentTime.getHours() &&
-                        citaDate.getMinutes() === currentTime.getMinutes() &&
-                        citaDate.getSeconds() === currentTime.getSeconds()
-                    );
-                }).length;
-
-                if (citasEnHora < maxPersonal && citasEnHora < maxEstaciones) {
-                    if (currentTime.getHours() === 12 && currentTime.getMinutes() === 0) {
-                        currentTime.setHours(13, 0, 0, 0);
-                    }
-
-                    availableTimes.push(currentTime.toISOString());
-                }
-
-                currentTime.setMinutes(currentTime.getMinutes() + this.duration);
-            }
+        if (estacionesOcupadas < this.estaciones && personalOcupado < this.personalTotal) {
+            availableTimes.push(currentTime.toISOString());
         }
+
+        currentTime.setUTCMinutes(currentTime.getUTCMinutes() + this.duration);
     }
 
     return availableTimes;
