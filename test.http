@@ -124,11 +124,11 @@ auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQyNDE0ODI2OWRmOGV
 
 {
     "servicioId": "664245bfe5f2b8152694866d",
-    "nombre": "Priscila Garcia",
+    "nombre": "Priscila Lopez",
     "fechaNacimiento": "2001-08-23",
-    "telefono": "76453263",
+    "telefono": "75682298",
     "preferencias": "Me gusta mucho cuidarme el cabello ya que tiene mucho volumen y me encanta andar bella",
-    "citaDate" : "2024-06-20",
+    "citaDate" : "2024-06-23",
     "hora": "13:00"
 }
 ### post experiences
