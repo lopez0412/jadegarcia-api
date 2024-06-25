@@ -1,8 +1,8 @@
 const axios = require('axios');
 
 // Reemplaza estos valores con tus credenciales y número de teléfono
-const accessToken = 'EAAG05yRobDQBO7GmJ6SYAyMvw6Dr6Na9bJ6FfGBsc6iOcAo8n7nZCQoM6bSG2pvJ18Q20ZABdwWbIyU7r6qpyqasQ9O5J1zOszYEn9gfGGHqWXN2dp1wyOE7jgmIDsS4uuVeY5qUqC2TbZCJhAeKSR9jdaZCa4nuZA4yl0b26jNqR6tds1Jf9QYG6oXnMq70D0ZCqiIZAPHNGojopAAr3YZD';
-const phoneNumberId = '293856593820867';
+const accessToken = 'EAAG05yRobDQBO5h018ZCn8qtFtAXv6qee4A5C7xtGw8JhGes8HRiRxhytp7dkKGXZC3nQV24BSotbjwahDf5cvO1WdhZAn6Jsh496BB1Wp9SEfvVB808GXDZBuVylZCUZC0dnJDnZBeYPTkcde9HIaAZA6ydUYMnvuWZAne7427R3IXZC46VXKmQDmCR7aL76yUaLtUExuUndL0VoX5opiuwZDZD';
+const phoneNumberId = '372011522654298';
 
 
 const sendMessage = async (recipientPhoneNumber, message) => {

@@ -32,7 +32,7 @@ content-type: application/json
 ### get trips
 GET http://127.0.0.1:3000/api/getAllCitas
 content-type: application/json
-auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQyNDE0ODI2OWRmOGVjZmJiNmYzN2UiLCJ1c2VybmFtZSI6ImFsZWphbmRybyIsInJvbGVzIjpbIkFkbWluIiwiVXNlciJdLCJpYXQiOjE3MTcwMjg0MjksImV4cCI6MTcxNzA1NzIyOX0.knJ-RxPYX5GEqwHHivnJc7WcRDoE1bhJJ-xlffIXHTk
+auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQyNDE0ODI2OWRmOGVjZmJiNmYzN2UiLCJ1c2VybmFtZSI6ImFsZWphbmRybyIsInJvbGVzIjpbIkFkbWluIiwiVXNlciJdLCJpYXQiOjE3MTkyNjg5OTEsImV4cCI6MTcxOTI5Nzc5MX0._3NHvxTbqJgeOxudT0uaHcgvtmIljUbiB7Pqbs1hQVA
 
 ###Completar
 PUT http://127.0.0.1:3000/api/citas/6642a210dad9405091e6c94e/completar
@@ -46,7 +46,7 @@ auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQyNDE0ODI2OWRmOGV
 
 
 ### get trips
-GET http://127.0.0.1:3000/api/disponibilidad/6653c460dc52b042dea0f6f2/2024-06-06
+GET http://127.0.0.1:3000/api/disponibilidad/6653c460dc52b042dea0f6f2/2024-06-13
 content-type: application/json
 
 ### get reservation by date
@@ -123,12 +123,12 @@ content-type: application/json
 auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQyNDE0ODI2OWRmOGVjZmJiNmYzN2UiLCJ1c2VybmFtZSI6ImFsZWphbmRybyIsInJvbGVzIjpbIkFkbWluIiwiVXNlciJdLCJpYXQiOjE3MTU2MTg5MjYsImV4cCI6MTcxNTY0NzcyNn0.bjLnuYDMe7wvO8PpM8b8sB1QAYJ1WKSy1cOOqAg6BuQ
 
 {
-    "servicioId": "664245bfe5f2b8152694866d",
+    "servicioId": "6653c460dc52b042dea0f6f2",
     "nombre": "Priscila Garcia",
     "fechaNacimiento": "2001-08-23",
-    "telefono": "76453263",
+    "telefono": "75682298",
     "preferencias": "Me gusta mucho cuidarme el cabello ya que tiene mucho volumen y me encanta andar bella",
-    "citaDate" : "2024-06-20",
+    "citaDate" : "2024-06-25",
     "hora": "13:00"
 }
 ### post experiences
