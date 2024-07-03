@@ -8,15 +8,15 @@ const citasSchema = new mongoose.Schema({
     },
     nombre: {
         type: String,
-        required: true
+        required: false
     },
     fechaNacimiento: {
         type: Date,
-        required: true
+        required: false
     },
     telefono:{
         type: String,
-        required: true
+        required: false
     },
     preferencias:{
         type:String,
@@ -38,7 +38,12 @@ const citasSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User', // Referencia al modelo de usuario
         required: false
-    }
+    },
+    userId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: false
+    },
 });
 
 const Citas = mongoose.model('Citas', citasSchema);

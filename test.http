@@ -1,0 +1,79 @@
+###get Citas
+
+http://127.0.0.1:3000/api/getAllCitas
+Content-Type: application/json
+auth-token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjdhZDViZDRhNTJkNTFiNGJiNzMzOGMiLCJ1c2VybmFtZSI6ImFkbWluMTIzIiwibm9tYnJlIjoiQWRtaW4iLCJyb2xlcyI6WyJBZG1pbiJdLCJpYXQiOjE3MTk4NzA1NTksImV4cCI6MTcxOTg5OTM1OX0.H2_WZY4PzKcctANksf0Zi26uIzNIaQmCJ9w7jOnO4dE
+
+
+
+
+###login
+POST http://127.0.0.1:3000/api/login
+Content-Type: application/json
+
+{
+    "username": "admin123",
+    "password": "JLorenzana04$$"
+}
+
+###login
+POST http://127.0.0.1:3000/api/register
+Content-Type: application/json
+
+{
+    "nombre": "Admin",
+    "username": "admin123",
+    "password": "JLorenzana04$$",
+    "roles": ["Admin"]
+}
+
+
+###login
+POST http://127.0.0.1:3000/api/register
+Content-Type: application/json
+
+{
+    "nombre": "Priscila Garcia",
+    "username": "jprisci",
+    "password": "jadeGarcia03$$",
+    "roles": ["Admin"]
+}
+
+###get Personal
+
+http://127.0.0.1:3000/api/personal
+Content-Type: application/json
+auth-token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjdhZDViZDRhNTJkNTFiNGJiNzMzOGMiLCJ1c2VybmFtZSI6ImFkbWluMTIzIiwibm9tYnJlIjoiQWRtaW4iLCJyb2xlcyI6WyJBZG1pbiJdLCJpYXQiOjE3MTkzMjYzMjYsImV4cCI6MTcxOTM1NTEyNn0.qFnbast81nrX5k1hs3jxOvmS9neCThcGqdBDlJo8COI
+
+
+###get Personal
+
+http://127.0.0.1:3000/api/servicios/categorias
+Content-Type: application/json
+auth-token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjdhZDViZDRhNTJkNTFiNGJiNzMzOGMiLCJ1c2VybmFtZSI6ImFkbWluMTIzIiwibm9tYnJlIjoiQWRtaW4iLCJyb2xlcyI6WyJBZG1pbiJdLCJpYXQiOjE3MTkzMjYzMjYsImV4cCI6MTcxOTM1NTEyNn0.qFnbast81nrX5k1hs3jxOvmS9neCThcGqdBDlJo8COI
+
+
+###login
+POST http://127.0.0.1:3000/api/registerUser
+Content-Type: application/json
+
+{
+    "nombre": "Priscila Garcia",
+    "username": "75682298",
+    "password": "jadeGarcia03$$",
+    "informacion": {
+       "nombre": "Priscila Garcia",
+       "fechaNacimiento": "2001-05-20",
+       "telefono":"75682298",
+       "preferencias": "Amo tener mi cabello en buen estado"
+    }
+}
+
+###login
+POST http://127.0.0.1:3000/api/loginUser
+Content-Type: application/json
+
+{
+    "username": "78902900",
+    "password": "Andrea123"
+}

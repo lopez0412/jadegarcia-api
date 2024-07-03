@@ -139,11 +139,12 @@ router.delete('/services/:id', validateToken, async (req, res) => {
     }
 });
 
-// Ruta para obtener las categorías guardadas sin repeticiones
+// Ruta para obtener las categorías guardadas sin repeticiones, todas convertidas a minúsculas y unificadas
 router.get('/servicios/categorias', async (req, res) => {
     try {
         const categorias = await Services.distinct('categoria');
-        res.status(200).json(categorias);
+        const categoriasUnicas = [...new Set(categorias.map(categoria => categoria.toLowerCase()))];
+        res.status(200).json(categoriasUnicas);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener las categorías', error });
     }

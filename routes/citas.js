@@ -40,6 +40,31 @@ router.post('/postCita', async (req,res) => {
     }
 })
 
+router.post('/postCitaUser', async (req, res) => {
+    try {
+
+        const { servicioId, userId, telefono, citaDate, hora } = req.body;
+
+        const fecha = new Date(citaDate);
+        const horaArray = hora.split(':');
+        fecha.setUTCHours(parseInt(horaArray[0], 10));
+        fecha.setMinutes(parseInt(horaArray[1], 10));
+
+        const data = new Model({
+            servicioId,
+            userId,
+            citaDate: fecha
+        });
+
+        const dataToSave = await data.save();
+        mensajeria.sendMessage("+503" + telefono, "Tu cita ha sido agendada el dia " + citaDate + " a las " + hora);
+        res.status(200).json({ tipo: 'success', mensaje: "Cita Agregada Correctamente", data: dataToSave });
+    } catch (error) {
+            res.status(500).json({ message: error.message });
+    }
+});
+
+
 //Get All data
 router.get('/getAllCitas', async (req, res) => {
     // Verify token
@@ -53,9 +78,14 @@ router.get('/getAllCitas', async (req, res) => {
         // Obtener fecha de hoy
         const today = moment().startOf('day');
         
-        // Encontrar citas para hoy y el futuro
-        const data = await Model.find({ citaDate: { $gte: today } }).populate('servicioId').sort({ citaDate: 1 });
-        
+        // Encontrar citas para hoy y el futuro, incluyendo información del usuario si está disponible
+        const data = await Model.find({ citaDate: { $gte: today } })
+                                .populate('servicioId')
+                                .populate({
+                                    path: 'userId',
+                                    select: 'id nombre username informacion'
+                                })
+                                .sort({ citaDate: 1 });
         res.json(data);
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
@@ -264,4 +294,120 @@ router.get('/total-mes/:mes', async (req, res) => {
             res.status(500).json({ message: 'Error al obtener el total del mes', error });
     }
 });
+
+router.get('/total-dia', async (req, res) => {
+    const fechaHoyInicio = new Date();
+    fechaHoyInicio.setHours(0, 0, 0, 0);
+
+    const fechaHoyFin = new Date();
+    fechaHoyFin.setHours(23, 59, 59, 999);
+
+    try {
+        const totalDia = await Model.aggregate([
+            {
+                $match: {
+                    estado: 'Completa',
+                    citaDate: { $gte: fechaHoyInicio, $lte: fechaHoyFin }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: '$total' }
+                }
+            }
+        ]);
+
+        const total = totalDia.length > 0 ? totalDia[0].total : 0;
+
+        res.status(200).json({ total });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener el total del día', error });
+    }
+});
+
+
+router.get('/citas-por-estilista', async (req, res) => {
+    try {
+        const citasPorEstilista = await Model.aggregate([
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'estilistaId',
+                    foreignField: '_id',
+                    as: 'estilistaInfo'
+                }
+            },
+            {
+                $match: {
+                    'estilistaInfo.roles': 'Estilista'
+                }
+            },
+            {
+                $group: {
+                    _id: '$estilistaId',
+                    citas: { $push: '$$ROOT' }
+                }
+            }
+        ]);
+
+        if (!citasPorEstilista.length) {
+            return res.status(404).json({ message: 'No se encontraron citas para estilistas' });
+        }
+
+        res.status(200).json(citasPorEstilista);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener las citas por estilista', error });
+    }
+});
+
+router.get('/historial-citas-clienta', async (req, res) => {
+    try {
+        const userId = req.query.userId; // Assuming the user ID is passed as a query parameter
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required' });
+        }
+
+        const historialCitas = await Model.aggregate([
+            {
+                $match: {
+                    userId: mongoose.Types.ObjectId(userId),
+                    'userInfo.roles': 'Clienta'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'userId',
+                    foreignField: '_id',
+                    as: 'userInfo'
+                }
+            },
+            {
+                $unwind: '$userInfo'
+            },
+            {
+                $project: {
+                    _id: 1,
+                    fecha: 1,
+                    servicio: 1,
+                    'userInfo.nombre': 1
+                }
+            },
+            {
+                $sort: { fecha: -1 } // Sorting by date in descending order
+            }
+        ]);
+
+        if (historialCitas.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron citas para la clienta' });
+        }
+
+        res.status(200).json(historialCitas);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener el historial de citas', error });
+    }
+});
+
+
 
