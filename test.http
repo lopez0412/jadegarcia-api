@@ -10,7 +10,7 @@ http://127.0.0.1:3000/api/search
 Content-Type: application/json
 
 {
-    "nombre" : "Pris"
+    "nombre" : "7568"
 }
 
 

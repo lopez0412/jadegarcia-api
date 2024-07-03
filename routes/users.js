@@ -146,15 +146,11 @@ router.post('/addUserNote', async (req, res) => {
 });
 
 router.get('/search', async (req, res) => {
-    const { nombre, telefono } = req.body;
+    const { nombre } = req.body;
     const query = { roles: { $in: ['User', 'Client'] } };
 
     if (nombre) {
         query.nombre = { $regex: nombre, $options: 'i' };
-    }
-
-    if (telefono) {
-        query.telefono = { $regex: telefono, $options: 'i' };
     }
 
     try {
