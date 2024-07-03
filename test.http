@@ -4,6 +4,14 @@ http://127.0.0.1:3000/api/getAllCitas
 Content-Type: application/json
 auth-token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjdhZDViZDRhNTJkNTFiNGJiNzMzOGMiLCJ1c2VybmFtZSI6ImFkbWluMTIzIiwibm9tYnJlIjoiQWRtaW4iLCJyb2xlcyI6WyJBZG1pbiJdLCJpYXQiOjE3MTk4NzA1NTksImV4cCI6MTcxOTg5OTM1OX0.H2_WZY4PzKcctANksf0Zi26uIzNIaQmCJ9w7jOnO4dE
 
+###get Citas
+
+http://127.0.0.1:3000/api/search
+Content-Type: application/json
+
+{
+    "nombre" : "Pris"
+}
 
 
 
