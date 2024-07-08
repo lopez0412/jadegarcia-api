@@ -85,3 +85,11 @@ Content-Type: application/json
     "username": "78902900",
     "password": "Andrea123"
 }
+
+### get historial por usuario
+GET http://127.0.0.1:3000/api/historial-citas-clienta
+Content-Type: application/json
+
+{
+    "userId" : "667c9312c313f701b9906b62"
+}

@@ -340,38 +340,39 @@ router.get('/citas-por-estilista', async (req, res) => {
             },
             {
                 $match: {
-                    'estilistaInfo.roles': 'Estilista'
+                    'estilistaInfo.roles': 'Estilista',
+                    'citaDate': { $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)), $lte: new Date() }
                 }
             },
             {
                 $group: {
                     _id: '$estilistaId',
-                    citas: { $push: '$$ROOT' }
+                    citas: { $push: '$$ROOT' },
+                    total: { $sum: 1 }
                 }
             }
         ]);
 
         if (!citasPorEstilista.length) {
-            return res.status(404).json({ message: 'No se encontraron citas para estilistas' });
+            return res.status(404).json({ message: 'No se encontraron citas para estilistas este mes' });
         }
 
         res.status(200).json(citasPorEstilista);
     } catch (error) {
-        res.status(500).json({ message: 'Error al obtener las citas por estilista', error });
+        res.status(500).json({ message: 'Error al obtener las citas por estilista este mes', error });
     }
 });
 
 router.get('/historial-citas-clienta', async (req, res) => {
     try {
-        const userId = req.query.userId; // Assuming the user ID is passed as a query parameter
+        const userId = req.body.userId; // Assuming the user ID is passed in the request body
         if (!userId) {
             return res.status(400).json({ message: 'User ID is required' });
         }
-
         const historialCitas = await Model.aggregate([
             {
                 $match: {
-                    userId: mongoose.Types.ObjectId(userId),
+                    userId: new mongoose.Types.ObjectId(userId),
                     'userInfo.roles': 'Clienta'
                 }
             },
@@ -396,6 +397,9 @@ router.get('/historial-citas-clienta', async (req, res) => {
             },
             {
                 $sort: { fecha: -1 } // Sorting by date in descending order
+            },
+            {
+                $limit: 5 // Limiting to the last 5 citations
             }
         ]);
 
@@ -405,6 +409,7 @@ router.get('/historial-citas-clienta', async (req, res) => {
 
         res.status(200).json(historialCitas);
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: 'Error al obtener el historial de citas', error });
     }
 });
