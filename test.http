@@ -87,9 +87,5 @@ Content-Type: application/json
 }
 
 ### get historial por usuario
-GET http://127.0.0.1:3000/api/historial-citas-clienta
+GET http://127.0.0.1:3000/api/historial-citas-clienta?userId=667c9312c313f701b9906b62
 Content-Type: application/json
-
-{
-    "userId" : "667c9312c313f701b9906b62"
-}

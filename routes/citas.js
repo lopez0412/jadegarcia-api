@@ -365,15 +365,14 @@ router.get('/citas-por-estilista', async (req, res) => {
 
 router.get('/historial-citas-clienta', async (req, res) => {
     try {
-        const userId = req.body.userId; // Assuming the user ID is passed in the request body
+        const userId = req.query.userId; // Assuming the user ID is passed in the request query
         if (!userId) {
             return res.status(400).json({ message: 'User ID is required' });
         }
         const historialCitas = await Model.aggregate([
             {
                 $match: {
-                    userId: new mongoose.Types.ObjectId(userId),
-                    'userInfo.roles': 'Clienta'
+                    userId: new mongoose.Types.ObjectId(userId)
                 }
             },
             {
@@ -385,14 +384,28 @@ router.get('/historial-citas-clienta', async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: 'services',
+                    localField: 'servicioId',
+                    foreignField: '_id',
+                    as: 'servicioInfo'
+                }
+            },
+            {
                 $unwind: '$userInfo'
+            },
+            {
+                $unwind: '$servicioInfo'
             },
             {
                 $project: {
                     _id: 1,
-                    fecha: 1,
-                    servicio: 1,
-                    'userInfo.nombre': 1
+                    citaDate: 1,
+                    servicioId: 1,
+                    'userInfo.nombre': 1,
+                    'servicioInfo.nombre': 1,
+                    total: 1,
+                    estado: 1
                 }
             },
             {
