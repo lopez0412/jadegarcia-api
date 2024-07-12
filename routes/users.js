@@ -161,6 +161,73 @@ router.get('/search', async (req, res) => {
     }
 });
 
+router.post('/resetPassword', async (req, res) => {
+    const { userId } = req.body;
+    if (!userId) {
+        return res.status(400).send('User ID is required');
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        const newPassword = Math.random().toString(36).slice(-8);
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+        res.send({newPass: newPassword, message: `Password reestablecido Exitosamente. Nuevo password: ${newPassword}`});
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+router.post('/changePassword', async (req, res) => {
+    const { userId, currentPassword, newPassword } = req.body;
+    if (!userId || !currentPassword || !newPassword) {
+        return res.status(400).send('User ID, current password and new password are required');
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).send('Current password is incorrect');
+        }
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        await user.save();
+        res.send({data: true , message: 'Password cambiado Exitosamente'});
+    } catch (error) {
+        res.status(500).send({data: true , message:error});
+    }
+});
+
+router.get('/findUserByPhone', async (req, res) => {
+    const { phone } = req.query;
+    if (!phone) {
+        return res.status(400).send('Phone number is required');
+    }
+
+    try {
+        const user = await User.findOne({ username: phone });
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        res.send(user);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+
 
 
 
