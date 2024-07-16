@@ -95,6 +95,37 @@ router.get('/getAllCitas', async (req, res) => {
         }
     }
 })
+//Get All data for the current month
+router.get('/getAllCitasMonth', async (req, res) => {
+    // Verify token
+    const token = req.header('auth-token');
+    if (!token) return res.status(401).send('Access Denied');
+
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verified;
+
+        // Obtener fecha de inicio y fin del mes actual
+        const startOfMonth = moment().startOf('month');
+        const endOfMonth = moment().endOf('month');
+        
+        // Encontrar citas para el mes actual, incluyendo información del usuario si está disponible
+        const data = await Model.find({ citaDate: { $gte: startOfMonth, $lte: endOfMonth } })
+                                .populate('servicioId')
+                                .populate({
+                                    path: 'userId',
+                                    select: 'id nombre username informacion'
+                                })
+                                .sort({ citaDate: 1 });
+        res.json(data);
+    } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            res.status(400).json({message: 'Invalid Token'});
+        } else {
+            res.status(500).json({message: error.message});
+        }
+    }
+})
 
 // Ruta para obtener todas las citas
 router.get('/citas', async (req, res) => {
@@ -262,14 +293,21 @@ router.put('/citas/:id/completar', async (req, res) => {
     }
 });
 
-// Ruta para obtener el total del mes por total de las citas completas
-router.get('/total-mes/:mes', async (req, res) => {
+// Ruta para obtener el total del mes y del día de las citas completas
+router.get('/total-mes-dia/:mes', async (req, res) => {
     const { mes } = req.params;
     const anioActual = new Date().getFullYear(); // Puedes ajustar el año si lo necesitas
 
     // Crear las fechas de inicio y fin del mes
     const fechaInicio = new Date(anioActual, mes - 1, 1);
     const fechaFin = new Date(anioActual, mes, 0, 23, 59, 59, 999); // Último día del mes
+
+    // Crear fechas de inicio y fin del día
+    const fechaHoyInicio = new Date();
+    fechaHoyInicio.setHours(0, 0, 0, 0);
+
+    const fechaHoyFin = new Date();
+    fechaHoyFin.setHours(23, 59, 59, 999);
 
     try {
         const totalMes = await Model.aggregate([
@@ -287,22 +325,6 @@ router.get('/total-mes/:mes', async (req, res) => {
             }
         ]);
 
-        const total = totalMes.length > 0 ? totalMes[0].total : 0;
-
-        res.status(200).json({ total });
-    } catch (error) {
-            res.status(500).json({ message: 'Error al obtener el total del mes', error });
-    }
-});
-
-router.get('/total-dia', async (req, res) => {
-    const fechaHoyInicio = new Date();
-    fechaHoyInicio.setHours(0, 0, 0, 0);
-
-    const fechaHoyFin = new Date();
-    fechaHoyFin.setHours(23, 59, 59, 999);
-
-    try {
         const totalDia = await Model.aggregate([
             {
                 $match: {
@@ -318,11 +340,12 @@ router.get('/total-dia', async (req, res) => {
             }
         ]);
 
-        const total = totalDia.length > 0 ? totalDia[0].total : 0;
+        const totalMesValor = totalMes.length > 0 ? totalMes[0].total : 0;
+        const totalDiaValor = totalDia.length > 0 ? totalDia[0].total : 0;
 
-        res.status(200).json({ total });
+        res.status(200).json({ totalMes: totalMesValor, totalDia: totalDiaValor });
     } catch (error) {
-        res.status(500).json({ message: 'Error al obtener el total del día', error });
+        res.status(500).json({ message: 'Error al obtener el total del mes y del día', error });
     }
 });
 
@@ -333,7 +356,7 @@ router.get('/citas-por-estilista', async (req, res) => {
             {
                 $lookup: {
                     from: 'users',
-                    localField: 'estilistaId',
+                    localField: 'atendidoPor',
                     foreignField: '_id',
                     as: 'estilistaInfo'
                 }
@@ -346,9 +369,9 @@ router.get('/citas-por-estilista', async (req, res) => {
             },
             {
                 $group: {
-                    _id: '$estilistaId',
-                    citas: { $push: '$$ROOT' },
-                    total: { $sum: 1 }
+                    _id: { id: '$atendidoPor', nombre: '$estilistaInfo.nombre' },
+                    totalCitas: { $sum: 1 },
+                    totalDinero: { $sum: '$total' }
                 }
             }
         ]);
@@ -360,6 +383,48 @@ router.get('/citas-por-estilista', async (req, res) => {
         res.status(200).json(citasPorEstilista);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener las citas por estilista este mes', error });
+    }
+});
+
+router.get('/maxima-vendedora', async (req, res) => {
+    try {
+        const maximaVendedora = await Model.aggregate([
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'atendidoPor',
+                    foreignField: '_id',
+                    as: 'estilistaInfo'
+                }
+            },
+            {
+                $match: {
+                    'estilistaInfo.roles': 'Estilista',
+                    'citaDate': { $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)), $lte: new Date() }
+                }
+            },
+            {
+                $group: {
+                    _id: { id: '$atendidoPor', nombre: { $arrayElemAt: ['$estilistaInfo.nombre', 0] } },
+                    totalDinero: { $sum: '$total' },
+                    totalCitas: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { totalDinero: -1 }
+            },
+            {
+                $limit: 1
+            }
+        ]);
+
+        if (!maximaVendedora.length) {
+            return res.status(404).json({ message: 'No se encontró la máxima vendedora este mes' });
+        }
+
+        res.status(200).json(maximaVendedora[0]);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener la máxima vendedora este mes', error });
     }
 });
 

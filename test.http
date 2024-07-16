@@ -1,8 +1,12 @@
 ###get Citas
 
-http://127.0.0.1:3000/api/getAllCitas
+http://127.0.0.1:3000/api/getAllCitasMonth
 Content-Type: application/json
-auth-token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjdhZDViZDRhNTJkNTFiNGJiNzMzOGMiLCJ1c2VybmFtZSI6ImFkbWluMTIzIiwibm9tYnJlIjoiQWRtaW4iLCJyb2xlcyI6WyJBZG1pbiJdLCJpYXQiOjE3MTk4NzA1NTksImV4cCI6MTcxOTg5OTM1OX0.H2_WZY4PzKcctANksf0Zi26uIzNIaQmCJ9w7jOnO4dE
+auth-token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjdhZDViZDRhNTJkNTFiNGJiNzMzOGMiLCJ1c2VybmFtZSI6ImFkbWluMTIzIiwibm9tYnJlIjoiQWRtaW4iLCJyb2xlcyI6WyJBZG1pbiJdLCJpYXQiOjE3MjExNjk5MzIsImV4cCI6MTcyMTE5ODczMn0.nmYcnhUxJK_RjCwvoboWK8KjWXhboA_ohXfEys5iC4s
+
+
+### get disponibilidad
+GET http://localhost:3000/api/disponibilidad/6647f720da9363e22fc003d7/2024-07-16
 
 ###get Citas
 
@@ -94,3 +98,16 @@ Content-Type: application/json
 ### get historial por usuario
 GET http://127.0.0.1:3000/api/findUserByPhone?phone=78902900
 Content-Type: application/json
+
+### get repport citas ppopr estilista
+GET http://127.0.0.1:3000/api/citas-por-estilista
+Content-Type: application/json
+
+### get repport citas ppopr estilista
+GET http://127.0.0.1:3000/api/maxima-vendedora
+Content-Type: application/json
+
+### get repport total dia
+GET http://127.0.0.1:3000/api/total-dia
+Content-Type: application/json
+
